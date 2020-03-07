@@ -37,7 +37,7 @@
             <v-list-item-title>Sign in</v-list-item-title>
           </v-list-item-content>
         </v-list-item>
-		<v-list-item link to="/logout" v-if="loggedin === true">
+		<v-list-item link v-if="loggedin === true" v-on:click="logout()">
           <v-list-item-action>
             <v-icon>mdi-account-remove-outline</v-icon>
           </v-list-item-action>
@@ -97,15 +97,29 @@
     data: () => ({
       drawer: null,
 	  loggedin: false,
-	  created() {
+    }),
+	methods: {
+	  logout(){
+		$cookies.set('JWT', '');
+		window.location.reload();
+	  }
+	},
+	created: function() {
 		if (!!$cookies.get('JWT')) {
 			var roles = [];
-			var jwt = parseJwt($.cookie('JWT'));
-			loggedin = jwt.sub;
+			var token = $cookies.get('JWT');
+			var base64Url = token.split('.')[1];
+			var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+			var jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+				return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+			}).join(''));
+			
+			var jwt = JSON.parse(jsonPayload);
+			this.loggedin = (jwt.sub != '');
+		}else{
+			this.loggedin = false;
 		}
-		loggedin = false;
 	  }
-    }),
   }
 
 </script>
