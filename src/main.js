@@ -9,6 +9,8 @@ Vue.config.productionTip = false
 import welcome from './components/welcome.vue'
 import registration from './components/registration.vue'
 import login from './components/login.vue'
+import resources from './components/resources.vue'
+import resourceEntry from './components/resourceEntry.vue'
 Vue.use(VueRouter)
 Vue.use(VueCookies)
 
@@ -35,6 +37,15 @@ let router = new VueRouter({
 	{
       path: '/login',
       component: login,
+    },
+	{
+      path: '/resources',
+      component: resources,
+    },
+	{
+      path: '/resourceEntry/:id',
+      component: resourceEntry,
+	  props: true,
     }
   ]
 })

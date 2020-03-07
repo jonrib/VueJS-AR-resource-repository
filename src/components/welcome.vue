@@ -5,7 +5,7 @@
 		<li>Navigate to <a href="/resources">"Resources"</a> to view available resources</li>
 		<li>Navigate to <a href="/tasks">"Tasks"</a> to view your tasks</li>
 		<li>Navigate to <a href="/login">"Login"</a> to login</li>
-		<li>Navigate to <a href="/register">"Register"</a> to register an account</li>
+		<li>Navigate to <a href="/registration">"Register"</a> to register an account</li>
 	</ul>
   </div>
 </template>
