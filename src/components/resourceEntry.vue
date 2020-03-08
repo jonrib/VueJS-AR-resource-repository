@@ -4,22 +4,37 @@
       ref="form"
       v-model="valid"
       :lazy-validation="lazy"
-	  class="col-6"
+	  class="col-12"
+	  
     >
+	<v-btn
+        color="indigo"
+        fab
+        small
+		class="float-right"
+        @click="isEditing = !isEditing"
+		v-if="canEditEntry() && id != 'new'"
+      >
+        <v-icon v-if="isEditing">mdi-close</v-icon>
+        <v-icon v-else>mdi-pencil</v-icon>
+    </v-btn>
 	  <v-alert type="success" v-if="showSuccess" dismissible transition="fade-transition">
 		  {{ successText }}
 	  </v-alert>
 	  <v-alert type="error" v-if="showFail" dismissible transition="fade-transition">
 		  {{ failText }}
 	  </v-alert>
+	 <v-container fluid class="float-left col-6">
       <v-text-field
         v-model="title"
         label="Title"
         required
+		:disabled="!isEditing"
 		:rules="titleRules"
       ></v-text-field>
 	  
 	  <v-text-field
+		:disabled="!isEditing"
         v-model="description"
         label="Description"
       ></v-text-field>
@@ -27,12 +42,14 @@
 	  <v-text-field
         v-model="tags"
         label="Tags (separated by ';')"
+		:disabled="!isEditing"
       ></v-text-field>
 	  
 	  <v-select
         v-model="category"
         :items="cats"
         label="Category"
+		:disabled="!isEditing"
       >
       </v-select>
 	  
@@ -40,6 +57,7 @@
         v-model="author"
         label="Author"
         readonly
+		:disabled="!isEditing"
       ></v-text-field>
 	  
 	  <v-autocomplete
@@ -50,6 +68,7 @@
 		v-model="readers"
 		v-if="isPrivate"
 		multiple
+		:disabled="!isEditing"
       ></v-autocomplete>
 	  
 	  <v-autocomplete
@@ -59,19 +78,40 @@
         label="Editors"
 		v-model="editors"
 		multiple
+		:disabled="!isEditing"
       ></v-autocomplete>
 	  
 	  
-	  <v-checkbox v-model="isPrivate" label="Private resource"></v-checkbox>
+	  <v-checkbox v-model="isPrivate" label="Private resource" :disabled="!isEditing"></v-checkbox>
 
       <v-btn
         :disabled="!valid"
         color="success"
         class="mr-4"
         @click="validate"
+		v-if="isEditing"
       >
-        Update
+        {{id == "new" ? "Create" : "Update"}}
       </v-btn>
+	  </v-container>
+	  
+	  <v-container fluid class="float-left col-6 overflow-y-auto" v-if="!isEditing">
+		<v-carousel
+			hide-delimiter-background
+			show-arrows-on-hover
+			height="100%"
+		  >
+			<v-carousel-item
+			  v-for="(previewImage, i) in previewImages"
+			  :key="i"
+			  :src="path+'/resourceEntries/'+id+'/previewImages/'+previewImage.id"
+			  :cover="true"
+			  
+			>
+			  
+			</v-carousel-item>
+		  </v-carousel>
+	  </v-container>
     </v-form>
 </template>
 <script>
@@ -93,6 +133,10 @@
 	  allUsers: [],
 	  readers: [],
 	  editors: [],
+	  path: '',
+        previewImages: [
+        ],
+	  isEditing: window.location.href.substring(window.location.href.lastIndexOf('/')+1,window.location.href.length) == 'new',
 	  cats: ['Architecture', 'Science', 'People', 'Misc'],
 	  id: window.location.href.substring(window.location.href.lastIndexOf('/')+1,window.location.href.length),
 	  titleRules: [
@@ -100,12 +144,16 @@
 	  ],
     }),
 	created: function(){
+		this.path = this.globalBackEndPath;
 		if (!parseInt(this.id)){
 			this.id = "new";
 		}
 		this.axios.get(this.globalBackEndPath+"/users").then((data)=>{for(var i = 0; i < data.data.length;i++){this.allUsers.push(data.data[i].username)}});
-		this.axios.get(this.globalBackEndPath+"/resourceEntries/"+this.id).then((data)=>{this.title = data.data.title; this.description = data.data.description; this.isPrivate = data.data.private; this.tags = data.data.tags.join(';'); this.category = data.data.category; this.author = data.data.author[0].username; for(var i = 0; i < data.data.readers.length; i++){this.readers.push(data.data.readers[i].username)} for(var i = 0; i < data.data.editors.length; i++){this.editors.push(data.data.editors[i].username)}})
-		console.log();
+		if (this.id != 'new'){
+			this.axios.get(this.globalBackEndPath+"/resourceEntries/"+this.id).then((data)=>{this.title = data.data.title; this.description = data.data.description; this.isPrivate = data.data.private; this.tags = data.data.tags.join(';'); this.category = data.data.category; this.author = data.data.author[0].username; for(var i = 0; i < data.data.readers.length; i++){this.readers.push(data.data.readers[i].username)} for(var i = 0; i < data.data.editors.length; i++){this.editors.push(data.data.editors[i].username)} this.previewImages = data.data.images}).catch((error) => {this.failText = error.response.data; this.showFail = true; setTimeout(()=>{this.showFail=false},3000)});
+		}else{
+			this.author = this.getLoggedInData().sub;
+		}
 	},
     methods: {
       validate () {
@@ -113,11 +161,17 @@
           this.snackbar = true;
 		  var entry = {title: this.title, description: this.description, private: this.isPrivate, tags: this.tags.split(';').map(s => s.trim()), category: this.category};
 		  var payload = {entry: entry, readers: this.readers, editors: this.editors};
-		  
-          this.axios.put(
-			this.globalBackEndPath+"/resourceEntries/"+this.id,
-			payload
-		  ).then(() => {this.successText = "Success!"; this.showSuccess = true; setTimeout(()=>{this.showSuccess=false;},3000)}).catch((error) => {this.failText = error.response.data; this.showFail = true; setTimeout(()=>{this.showFail=false},3000)});
+		  if (this.id != 'new'){
+			this.axios.put(
+				this.globalBackEndPath+"/resourceEntries/"+this.id,
+				payload
+			  ).then(() => {this.successText = "Success!"; this.showSuccess = true; setTimeout(()=>{this.showSuccess=false;},3000)}).catch((error) => {this.failText = error.response.data; this.showFail = true; setTimeout(()=>{this.showFail=false},3000)});
+		  }else{
+			this.axios.post(
+				this.globalBackEndPath+"/resourceEntries",
+				entry
+			  ).then(() => {this.successText = "Success!"; this.showSuccess = true; setTimeout(()=>{this.showSuccess=false;window.location.href="/resources"},3000)}).catch((error) => {this.failText = error.response.data; this.showFail = true; setTimeout(()=>{this.showFail=false},3000)});
+		  }
 		}
 	  },
 	  usersFilter (item, queryText, itemText) {		
@@ -128,6 +182,9 @@
       reset () {
         this.$refs.form.reset()
       },
+	  canEditEntry(){
+		return this.getLoggedInData().Role.indexOf('Admin') > -1 || this.author == this.getLoggedInData().sub || this.editors.indexOf(this.getLoggedInData().sub) > -1;
+	  },
     },
   }
 </script>
