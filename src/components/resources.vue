@@ -26,7 +26,7 @@
         <v-col cols="2" v-for="values in displayed">
           <v-card>
             <v-img
-              :src="values.images.length != 0 ? 'http://localhost:8081/resourceEntries/'+values.id+'/previewImages/'+values.images[0].id : 'http://localhost:8080/src/images/question.png'"
+              :src="values.images.length != 0 ? path+'/resourceEntries/'+values.id+'/previewImages/'+values.images[0].id : '/src/images/question.png'"
               height="250"
               class="grey darken-4"
             ></v-img>
@@ -72,9 +72,11 @@
 	  showDesc: {},
 	  showAll: true,
 	  showID: false,
+	  path: '',
     }),
 	created: function(){
-		this.axios.get("http://localhost:8081/resourceEntries").then((data)=> {this.all = data.data;for (var i = 0; i < this.all.length; i++){this.$set(this.showDesc, this.all[i].id, false);}}).catch((error)=>{console.error(error)});
+		this.path = this.globalBackEndPath;
+		this.axios.get(this.globalBackEndPath+"/resourceEntries").then((data)=> {this.all = data.data;for (var i = 0; i < this.all.length; i++){this.$set(this.showDesc, this.all[i].id, false);}}).catch((error)=>{console.error(error)});
 		this.numberOfPages = Math.ceil(this.all.length / this.perPage);
 		this.all;
 	},

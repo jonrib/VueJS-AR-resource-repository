@@ -72,7 +72,7 @@
 		  const config = { headers: { 'Content-Type': 'multipart/form-data' } };
 		  
           this.axios.post(
-			"http://localhost:8081/login",
+			this.globalBackEndPath+"/login",
 			payload,
 			config
 		  ).then(() => {this.successText = "Success!"; this.showSuccess = true; setTimeout(()=>{this.showSuccess=false; window.location.href = "/";},3000)}).catch((error) => {this.failText = error.response.data; this.showFail = true; setTimeout(()=>{this.showFail=false},3000)});

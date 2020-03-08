@@ -1,6 +1,5 @@
 import Vue from 'vue'
 import App from './App.vue'
-import TopBar from './TopBar.vue'
 import VueRouter from 'vue-router'
 import VueCookies from 'vue-cookies'
 
@@ -15,6 +14,14 @@ Vue.use(VueRouter)
 Vue.use(VueCookies)
 
 Vue.$cookies.config('7d')
+
+Vue.mixin({
+ data: function() {
+   return {
+     globalBackEndPath:'http://localhost:8081'
+   }
+ }
+})
 
 import vuetify from './plugins/vuetify' // path to vuetify export
 

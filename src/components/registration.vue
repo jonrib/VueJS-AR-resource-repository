@@ -103,7 +103,7 @@
 		  var payload = {username: this.username, email: this.email, password: this.password, passwordConfirm: this.repeatPassword};
           // send post request
 		  
-          this.axios.post("http://localhost:8081/users", payload).then(() => {this.successText = "Success!"; this.showSuccess = true; setTimeout(()=>{this.showSuccess=false; window.location.href = "/"},3000)}).catch((error) => {this.failText = error.response.data; this.showFail = true; setTimeout(()=>{this.showFail=false},3000)});
+          this.axios.post(this.globalBackEndPath+"/users", payload).then(() => {this.successText = "Success!"; this.showSuccess = true; setTimeout(()=>{this.showSuccess=false; window.location.href = "/"},3000)}).catch((error) => {this.failText = error.response.data; this.showFail = true; setTimeout(()=>{this.showFail=false},3000)});
 		}
 	  },
       reset () {
