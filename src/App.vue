@@ -7,7 +7,7 @@
       <v-list dense>
         <v-list-item link to="/welcome">
           <v-list-item-action>
-            <v-icon>mdi-home</v-icon>
+            <v-icon>mdi-home-outline</v-icon>
           </v-list-item-action>
           <v-list-item-content>
             <v-list-item-title>Welcome</v-list-item-title>

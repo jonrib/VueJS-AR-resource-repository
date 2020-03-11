@@ -21,7 +21,35 @@
     fluid
     style="min-height: 434px; max-width: 100%;"
   >
+	<v-toolbar dense floating>
+      <v-text-field
+        hide-details
+        prepend-icon=""
+        single-line
+		v-model="tags"
+      ></v-text-field>
+	   
+      <v-btn icon @click="filterByTags()">
+        <v-icon>mdi-magnify</v-icon>
+      </v-btn>
 
+      <v-btn icon @click="filterCategory('Architecture')">
+        <v-icon>mdi-city-variant-outline</v-icon>
+      </v-btn>
+	  
+	  <v-btn icon @click="filterCategory('Science')">
+        <v-icon>mdi-beaker-outline</v-icon>
+      </v-btn>
+	  
+	  <v-btn icon @click="filterCategory('People')">
+        <v-icon>mdi-account-group-outline</v-icon>
+      </v-btn>
+	  
+	  <v-btn icon @click="filterCategory('Misc')">
+        <v-icon>mdi-dots-horizontal-circle-outline</v-icon>
+      </v-btn>
+
+    </v-toolbar>
       <v-row>
         <v-col cols="2" v-for="values in displayed">
           <v-card>
@@ -73,6 +101,7 @@
 	  showAll: true,
 	  showID: false,
 	  path: '',
+	  tags: '',
     }),
 	created: function(){
 		this.path = this.globalBackEndPath;
@@ -88,7 +117,19 @@
 			let to = (page * perPage);
 			return  all.slice(from, to);
 		},
-		
+		filterCategory (category){
+			this.tags = '',
+			this.path = this.globalBackEndPath;
+			this.axios.get(this.globalBackEndPath+"/resourceEntries/category/"+category).then((data)=> {this.all = data.data;for (var i = 0; i < this.all.length; i++){this.$set(this.showDesc, this.all[i].id, false);}}).catch((error)=>{console.error(error)});
+			this.numberOfPages = Math.ceil(this.all.length / this.perPage);
+			this.all;
+		},
+		filterByTags (){
+			this.path = this.globalBackEndPath;
+			this.axios.get(this.globalBackEndPath+"/resourceEntries/tags/"+this.tags).then((data)=> {this.all = data.data;for (var i = 0; i < this.all.length; i++){this.$set(this.showDesc, this.all[i].id, false);}}).catch((error)=>{console.error(error)});
+			this.numberOfPages = Math.ceil(this.all.length / this.perPage);
+			this.all;
+		},
 	},
 	computed: {
 		displayed() {
