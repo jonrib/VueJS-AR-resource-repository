@@ -18,6 +18,49 @@
         <v-icon v-if="isEditing">mdi-close</v-icon>
         <v-icon v-else>mdi-pencil</v-icon>
     </v-btn>
+	<v-btn
+        color="indigo"
+        fab
+        small
+		class="float-right"
+        @click.stop="dialog = true"
+		style="margin-right:5px;"
+		v-if="canEditEntry() && id != 'new' && !isEditing"
+      >
+        <v-icon>mdi-delete</v-icon>
+    </v-btn>
+	<v-dialog
+      v-model="dialog"
+      max-width="450"
+    >
+      <v-card>
+        <v-card-title class="headline">Permanently delete resource entry?</v-card-title>
+
+        <v-card-text>
+          WARNING: entry and all the files, tasks associated with it will be permanently deleted!
+        </v-card-text>
+
+        <v-card-actions>
+          <v-spacer></v-spacer>
+
+          <v-btn
+            color="darken-1"
+            text
+            @click="dialog = false"
+          >
+            Disagree
+          </v-btn>
+
+          <v-btn
+            color="red darken-1"
+            text
+            @click="deleteEntry(); dialog = false"
+          >
+            Agree
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
 	  <v-alert type="success" v-if="showSuccess" dismissible transition="fade-transition">
 		  {{ successText }}
 	  </v-alert>
@@ -84,6 +127,14 @@
 	  
 	  <v-checkbox v-model="isPrivate" label="Private resource" :disabled="!isEditing"></v-checkbox>
 
+	  <v-file-input
+		label="Upload preview images"
+		prepend-icon="mdi-camera"
+		v-if="isEditing && id!='new'"
+		v-model="previewImageFiles"
+		multiple
+	></v-file-input>
+
       <v-btn
         :disabled="!valid"
         color="success"
@@ -95,7 +146,7 @@
       </v-btn>
 	  </v-container>
 	  
-	  <v-container fluid class="float-left col-6 overflow-y-auto" v-if="!isEditing">
+	  <v-container fluid class="float-left col-6 overflow-y-auto" >
 		<v-carousel
 			hide-delimiter-background
 			show-arrows-on-hover
@@ -106,7 +157,7 @@
 			  :key="i"
 			  :src="path+'/resourceEntries/'+id+'/previewImages/'+previewImage.id"
 			  :cover="true"
-			  
+			  lazy-src="'/src/images/loadingImage.gif'"
 			>
 			  
 			</v-carousel-item>
@@ -134,6 +185,8 @@
 	  readers: [],
 	  editors: [],
 	  path: '',
+	  dialog: false,
+	  previewImageFiles: [],
         previewImages: [
         ],
 	  isEditing: window.location.href.substring(window.location.href.lastIndexOf('/')+1,window.location.href.length) == 'new',
@@ -165,7 +218,31 @@
 			this.axios.put(
 				this.globalBackEndPath+"/resourceEntries/"+this.id,
 				payload
-			  ).then(() => {this.successText = "Success!"; this.showSuccess = true; setTimeout(()=>{this.showSuccess=false;},3000)}).catch((error) => {this.failText = error.response.data; this.showFail = true; setTimeout(()=>{this.showFail=false},3000)});
+			  ).then(() => {
+				  this.successText = "Successfuly updated entry!" + (this.previewImageFiles.length == 0 ? '' : ' Will upload images!');
+				  this.showSuccess = true;
+				  if (this.previewImageFiles.length == 0){
+					  setTimeout(()=>{this.showSuccess=false;window.location.href="/resources"},3000);
+				  }else{
+					setTimeout(()=>{this.showSuccess=false;},3000);
+					let formData = new FormData();
+					for( var i = 0; i < this.previewImageFiles.length; i++ ){
+						let file = this.previewImageFiles[i];
+						//TODO
+						//validate size and file type
+						formData.append('file', file);
+					}
+					var imageUrl =this.globalBackEndPath+"/resourceEntries/"+this.id+"/previewImages";
+					this.axios.post(imageUrl, 
+					formData,
+					{
+						headers: {
+							'Content-Type': 'multipart/form-data'
+						}
+					}).then(() => {this.successText = "Updated preview images!";this.showSuccess = true;setTimeout(()=>{this.showSuccess=false;},3000);window.location.href="/resources"}).catch((error)=>{this.failText = error.response.data; this.showFail = true; setTimeout(()=>{this.showFail=false},3000)})
+				  }
+				  
+		        }).catch((error) => {this.failText = error.response.data; this.showFail = true; setTimeout(()=>{this.showFail=false},3000)});
 		  }else{
 			this.axios.post(
 				this.globalBackEndPath+"/resourceEntries",
@@ -185,6 +262,9 @@
 	  canEditEntry(){
 		return this.getLoggedInData().Role.indexOf('Admin') > -1 || this.author == this.getLoggedInData().sub || this.editors.indexOf(this.getLoggedInData().sub) > -1;
 	  },
+	  deleteEntry (){
+		  this.axios.delete(this.globalBackEndPath+"/resourceEntries/"+this.id).then(()=>{this.successText = "Success!"; this.showSuccess = true; setTimeout(()=>{this.showSuccess=false;window.location.href="/resources"},3000)}).catch((error)=>{this.failText = error.response.data; this.showFail = true; setTimeout(()=>{this.showFail=false},3000)});
+	  }
     },
   }
 </script>

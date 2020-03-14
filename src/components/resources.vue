@@ -49,6 +49,14 @@
         <v-icon>mdi-dots-horizontal-circle-outline</v-icon>
       </v-btn>
 
+	  <v-btn icon @click="filterCategory('ALL')">
+        <v-icon>mdi-dots-horizontal</v-icon>
+      </v-btn>
+
+	  <v-btn icon @click="createResource()" v-if="this.getLoggedInData().sub != 'anonymousUser'">
+        <v-icon>mdi-plus</v-icon>
+      </v-btn>
+
     </v-toolbar>
       <v-row>
         <v-col cols="2" v-for="values in displayed">
@@ -58,7 +66,7 @@
               height="250"
               class="grey darken-4"
             ></v-img>
-            <v-card-title @click="showAll=false;showID=values.id" class="title"><v-btn text link :to="'/resourceEntry/'+values.id">{{values.title}}</v-btn></v-card-title>
+            <v-card-title class="title"><v-btn text link :to="'/resourceEntry/'+values.id">{{values.title}}</v-btn></v-card-title>
 			<v-card-actions>
 			  <v-spacer></v-spacer>
 
@@ -120,7 +128,10 @@
 		filterCategory (category){
 			this.tags = '',
 			this.path = this.globalBackEndPath;
-			this.axios.get(this.globalBackEndPath+"/resourceEntries/category/"+category).then((data)=> {this.all = data.data;for (var i = 0; i < this.all.length; i++){this.$set(this.showDesc, this.all[i].id, false);}}).catch((error)=>{console.error(error)});
+			if (category == 'ALL')
+				this.axios.get(this.globalBackEndPath+"/resourceEntries").then((data)=> {this.all = data.data;for (var i = 0; i < this.all.length; i++){this.$set(this.showDesc, this.all[i].id, false);}}).catch((error)=>{console.error(error)});
+			else
+				this.axios.get(this.globalBackEndPath+"/resourceEntries/category/"+category).then((data)=> {this.all = data.data;for (var i = 0; i < this.all.length; i++){this.$set(this.showDesc, this.all[i].id, false);}}).catch((error)=>{console.error(error)});
 			this.numberOfPages = Math.ceil(this.all.length / this.perPage);
 			this.all;
 		},
@@ -129,6 +140,10 @@
 			this.axios.get(this.globalBackEndPath+"/resourceEntries/tags/"+this.tags).then((data)=> {this.all = data.data;for (var i = 0; i < this.all.length; i++){this.$set(this.showDesc, this.all[i].id, false);}}).catch((error)=>{console.error(error)});
 			this.numberOfPages = Math.ceil(this.all.length / this.perPage);
 			this.all;
+		},
+		createResource (){
+			this.path = this.globalBackEndPath;
+			window.location.href = "/resourceEntry/new"
 		},
 	},
 	computed: {
