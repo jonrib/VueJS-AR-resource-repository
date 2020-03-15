@@ -1,11 +1,10 @@
 <template>
-	
+	<v-container fluid>
+	<v-container fluid class="col-12">
     <v-form
       ref="form"
       v-model="valid"
       :lazy-validation="lazy"
-	  class="col-12"
-	  
     >
 	<v-btn
         color="indigo"
@@ -128,11 +127,12 @@
 	  <v-checkbox v-model="isPrivate" label="Private resource" :disabled="!isEditing"></v-checkbox>
 
 	  <v-file-input
-		label="Upload preview images"
+		label="Upload preview images (recommended height is 680px)"
 		prepend-icon="mdi-camera"
 		v-if="isEditing && id!='new'"
 		v-model="previewImageFiles"
 		multiple
+		accept="image/*"
 	></v-file-input>
 
       <v-btn
@@ -145,25 +145,35 @@
         {{id == "new" ? "Create" : "Update"}}
       </v-btn>
 	  </v-container>
-	  
-	  <v-container fluid class="float-left col-6 overflow-y-auto" >
-		<v-carousel
+	  <v-container fluid class="float-right col-6">
+	  <v-carousel
 			hide-delimiter-background
 			show-arrows-on-hover
-			height="100%"
+			height="680px"
+			lazy
 		  >
 			<v-carousel-item
 			  v-for="(previewImage, i) in previewImages"
 			  :key="i"
 			  :src="path+'/resourceEntries/'+id+'/previewImages/'+previewImage.id"
 			  :cover="true"
-			  lazy-src="'/src/images/loadingImage.gif'"
+			  lazy-src="../../src/images/loadingImage.gif"
 			>
 			  
 			</v-carousel-item>
 		  </v-carousel>
+		  <v-data-table
+			:headers="previewImageHeaders"
+			:items="uploadedPreviewImageFiles"
+			:items-per-page="5"
+			class="elevation-1"
+			v-if="isEditing"
+		></v-data-table>
+		  </v-container>
+		  
+	  </v-form>	
 	  </v-container>
-    </v-form>
+	</v-container>
 </template>
 <script>
   export default {
@@ -187,14 +197,24 @@
 	  path: '',
 	  dialog: false,
 	  previewImageFiles: [],
-        previewImages: [
-        ],
+      previewImages: [],
 	  isEditing: window.location.href.substring(window.location.href.lastIndexOf('/')+1,window.location.href.length) == 'new',
 	  cats: ['Architecture', 'Science', 'People', 'Misc'],
 	  id: window.location.href.substring(window.location.href.lastIndexOf('/')+1,window.location.href.length),
 	  titleRules: [
 		 v => !!v || 'Title is required',
 	  ],
+	  previewImageHeaders: [
+          {
+            text: 'File',
+            align: 'start',
+            sortable: false,
+            value: 'name',
+          },
+          { text: 'Size in bytes', value: 'size' },
+		],
+		uploadedPreviewImageFiles: [
+		],
     }),
 	created: function(){
 		this.path = this.globalBackEndPath;
@@ -203,7 +223,12 @@
 		}
 		this.axios.get(this.globalBackEndPath+"/users").then((data)=>{for(var i = 0; i < data.data.length;i++){this.allUsers.push(data.data[i].username)}});
 		if (this.id != 'new'){
-			this.axios.get(this.globalBackEndPath+"/resourceEntries/"+this.id).then((data)=>{this.title = data.data.title; this.description = data.data.description; this.isPrivate = data.data.private; this.tags = data.data.tags.join(';'); this.category = data.data.category; this.author = data.data.author[0].username; for(var i = 0; i < data.data.readers.length; i++){this.readers.push(data.data.readers[i].username)} for(var i = 0; i < data.data.editors.length; i++){this.editors.push(data.data.editors[i].username)} this.previewImages = data.data.images}).catch((error) => {this.failText = error.response.data; this.showFail = true; setTimeout(()=>{this.showFail=false},3000)});
+			this.axios.get(this.globalBackEndPath+"/resourceEntries/"+this.id).then((data)=>{
+				this.title = data.data.title; this.description = data.data.description; this.isPrivate = data.data.private; this.tags = data.data.tags.join(';'); this.category = data.data.category; this.author = data.data.author[0].username; for(var i = 0; i < data.data.readers.length; i++){this.readers.push(data.data.readers[i].username)} for(var i = 0; i < data.data.editors.length; i++){this.editors.push(data.data.editors[i].username)} for(var i=0;i<data.data.images.length;i++){this.previewImages.push(data.data.images[i])}
+				for (var i = 0;i < data.data.images.length; i++){
+					this.uploadedPreviewImageFiles.push({name: data.data.images[i].fileName, size: data.data.images[i].size})
+				}
+			}).catch((error) => {this.failText = error.response.data; this.showFail = true; setTimeout(()=>{this.showFail=false},3000)});
 		}else{
 			this.author = this.getLoggedInData().sub;
 		}
@@ -229,8 +254,9 @@
 					for( var i = 0; i < this.previewImageFiles.length; i++ ){
 						let file = this.previewImageFiles[i];
 						//TODO
-						//validate size and file type
-						formData.append('file', file);
+						//validate size
+						if (file.type.indexOf('image')!=-1)
+							formData.append('file', file);
 					}
 					var imageUrl =this.globalBackEndPath+"/resourceEntries/"+this.id+"/previewImages";
 					this.axios.post(imageUrl, 
