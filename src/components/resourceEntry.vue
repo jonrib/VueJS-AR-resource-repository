@@ -272,7 +272,7 @@
 			</v-data-table>
 		  </v-container>
 	   <v-container fluid class="float-right col-12">
-		    DO DATABLE FOR COMMS
+		    <Comment v-for="comment in comments" v-bind:key="comment.id" :replies="comment.replies" :comment="comment" :level="0"/>
 	   </v-container>
 	  </v-form>	
 	  </v-container>
@@ -285,7 +285,6 @@
 	  showFail: false,
 	  successText: '',
 	  failText: '',
-	  successText: '',
       lazy: true,
       valid: true,
 	  title: '',
@@ -334,7 +333,10 @@
 		uploadedPreviewImageFiles: [
 		],
 		comments: [],
-    }),
+	}),
+	beforeCreate: function () {
+		this.$options.components.Comment = require('./comment.vue').default
+	},
 	created: function(){
 		this.path = this.globalBackEndPath;
 		if (!parseInt(this.id)){
