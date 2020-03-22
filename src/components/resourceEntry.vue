@@ -28,6 +28,17 @@
       >
         <v-icon>mdi-delete</v-icon>
     </v-btn>
+	<v-btn
+        color="indigo"
+        fab
+        small
+		class="float-right"
+        @click.stop="idToComment = 'new'; dialogComment = true; commentText = '';"
+		style="margin-right:5px;"
+		v-if="id != 'new'"
+      >
+        <v-icon>mdi-message</v-icon>
+    </v-btn>
 	<v-dialog
       v-model="dialog"
       max-width="450"
@@ -120,6 +131,40 @@
             @click="deleteFile(); dialogDelFile = false"
           >
             Agree
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+	<v-dialog
+      v-model="dialogComment"
+      max-width="450"
+    >
+      <v-card>
+        <v-card-title class="headline">Write your comment</v-card-title>
+
+        <v-textarea
+		label="Comment"
+		v-model="commentText"
+		style="padding: 20px"
+		></v-textarea>
+
+        <v-card-actions>
+          <v-spacer></v-spacer>
+
+          <v-btn
+            color="darken-1"
+            text
+            @click="commentText = ''; dialogComment = false"
+          >
+            Close
+          </v-btn>
+
+          <v-btn
+            color="green darken-1"
+            text
+            @click="postComment(); dialogComment = false; commentText = ''"
+          >
+            Post comment
           </v-btn>
         </v-card-actions>
       </v-card>
@@ -271,8 +316,22 @@
 			</template>
 			</v-data-table>
 		  </v-container>
-	   <v-container fluid class="float-right col-12">
-		    <Comment v-for="comment in comments" v-bind:key="comment.id" :replies="comment.replies" :comment="comment" :level="0"/>
+	   <v-container fluid class="float-right col-12" v-if="comments.length != 0">
+		   <v-list>
+			<v-list-group
+				prepend-icon="mdi-message"
+				no-action
+			>
+				<template v-slot:activator>
+				<v-list-item-content>
+					<v-list-item-title>Comments</v-list-item-title>
+				</v-list-item-content>
+				</template>
+
+				<Comment v-for="comment in comments" v-bind:key="comment.id" :replies="comment.replies" :comment="comment" :level="0"/>
+			 </v-list-group>
+			</v-list>
+		    
 	   </v-container>
 	  </v-form>	
 	  </v-container>
@@ -281,6 +340,9 @@
 <script>
   export default {
     data: () => ({
+	  idToComment: 'new',
+	  dialogComment: false,
+	  commentText: '',
       showSuccess: false,
 	  showFail: false,
 	  successText: '',
@@ -476,6 +538,15 @@
 				  }
 			  } 
 			  this.uploadedPrevFiles.splice(ind1, 1);
+		   }).catch((error)=>{this.failText = error.response.data; this.showFail = true; setTimeout(()=>{this.showFail=false},3000)});
+	  },
+	  postComment(){
+		  let commPayload = {message: this.commentText, userName: this.getLoggedInData().sub};
+		  this.axios.post(this.globalBackEndPath+"/resourceEntries/"+this.id+"/comments"+(this.idToComment=='new' ? '' : "/"+this.idToComment), commPayload).then(()=>{
+			  this.successText = "Success!";
+			  this.showSuccess = true;
+			  setTimeout(()=>{this.showSuccess=false},3000);
+			  this.comments.push({message: commPayload.message, userName: this.getLoggedInData().sub, date: new Date(),replies:[]});
 		   }).catch((error)=>{this.failText = error.response.data; this.showFail = true; setTimeout(()=>{this.showFail=false},3000)});
 	  },
     },
