@@ -272,26 +272,7 @@
 			</v-data-table>
 		  </v-container>
 	   <v-container fluid class="float-right col-12">
-		    <v-list>
-
-			<v-list-group
-				prepend-icon="mdi-message"
-				value="true"
-			>
-				<template v-slot:activator>
-				<v-list-item-title>User</v-list-item-title>
-				<v-list-item-title>Email</v-list-item-title>
-				</template>
-				
-				<v-list-item
-					v-for="(entry, i) in comments"
-					:key="i"
-					link
-				>
-					<v-list-item-title v-text="entry">TEST</v-list-item-title>
-				</v-list-item>
-			</v-list-group>
-			</v-list>
+		    DO DATABLE FOR COMMS
 	   </v-container>
 	  </v-form>	
 	  </v-container>
@@ -370,7 +351,7 @@
 					this.uploadedPrevFiles.push({name: data.data.files[i].fileName, size: data.data.files[i].size, id: data.data.files[i].id})
 				}
 				for (var i = 0;i < data.data.comments.length; i++){
-					this.comments.push(comments[i])
+					this.comments.push(data.data.comments[i])
 				}
 				
 			}).catch((error) => {this.failText = error.response.data; this.showFail = true; setTimeout(()=>{this.showFail=false},3000)});
