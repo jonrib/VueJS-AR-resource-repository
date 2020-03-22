@@ -100,22 +100,21 @@
     }),
 	methods: {
 	  logout(){
-		$cookies.set('JWT', '');
-		window.location.reload();
+    $cookies.set('JWTs', '');
+    this.axios.delete(this.globalBackEndPath+"/deleteJWT").then(()=>{window.location.reload();}).catch((error)=>{console.error(error.data);});
 	  }
 	},
 	created: function() {
-		if (!!$cookies.get('JWT')) {
+		if (!!$cookies.get('JWTs')) {
 			var roles = [];
-			var token = $cookies.get('JWT');
-			var base64Url = token.split('.')[1];
-			var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-			var jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
-				return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-			}).join(''));
+			var token = $cookies.get('JWTs');
+			//var base64Url = token.split('.')[1];
+			//var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+			//var jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+			//	return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+			//}).join(''));
 			
-			var jwt = JSON.parse(jsonPayload);
-			this.loggedin = (jwt.sub != '');
+			this.loggedin = (token.sub != '');
 		}else{
 			this.loggedin = false;
 		}

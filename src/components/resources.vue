@@ -62,11 +62,11 @@
         <v-col cols="2" v-for="values in displayed">
           <v-card>
             <v-img
-              :src="values.images.length != 0 ? path+'/resourceEntries/'+values.id+'/previewImages/'+values.images[0].id : '/src/images/question.png'"
+              :src="values.images.length != 0  && values.private == false ? path+'/resourceEntries/'+values.id+'/previewImages/'+values.images[0].id : '/src/images/question.png'"
               height="250"
               class="grey darken-4"
             ></v-img>
-            <v-card-title class="title"><v-btn text link :to="'/resourceEntry/'+values.id">{{values.title}}</v-btn></v-card-title>
+            <v-card-title class="title"><v-icon v-if="values.private == true">mdi-lock</v-icon><v-btn text link :to="'/resourceEntry/'+values.id">{{values.title}}</v-btn></v-card-title>
 			<v-card-actions>
 			  <v-spacer></v-spacer>
 
