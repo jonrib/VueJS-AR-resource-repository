@@ -328,7 +328,32 @@
 				</v-list-item-content>
 				</template>
 
-				<Comment v-for="comment in comments" v-bind:key="comment.id" :replies="comment.replies" :comment="comment" :level="0"/>
+				<Comment :resourceEntryId="id" v-for="comment in comments" v-bind:key="comment.id" :replies="comment.replies" :comment="comment" :level="0"/>
+			 </v-list-group>
+			</v-list>
+		    
+	   </v-container>
+	   <v-container fluid class="float-right col-12" v-if="histories.length != 0">
+		   <v-list>
+			<v-list-group
+				prepend-icon="mdi-account-clock"
+				no-action
+			>
+				<template v-slot:activator>
+				<v-list-item-content>
+					<v-list-item-title>Histories</v-list-item-title>
+				</v-list-item-content>
+				</template>
+				<div v-for="history in histories" v-bind:key="history.id">
+					<div class="float-left" style="width:100%;clear: both;">
+					<p style="margin-bottom: 0px; float: left">
+						<b>{{history.userName == '' || history.userName == 'anonymousUser' ? 'Anonymous' : history.userName}}</b> made changes at {{new Date(history.date).getFullYear()+'-'+((new Date(history.date).getMonth()+1+'').length == 1 ? '0'+(new Date(history.date).getMonth()+1) : (new Date(history.date).getMonth()+1))+'-'+((new Date(history.date).getDate()+1+'').length == 1 ? '0'+(new Date(history.date).getDate()+1) : (new Date(history.date).getDate()+1))+' '+((new Date(history.date).getHours()+1+'').length == 1 ? '0'+(new Date(history.date).getHours()+1) : (new Date(history.date).getHours()+1))+':'+((new Date(history.date).getMinutes()+1+'').length == 1 ? '0'+(new Date(history.date).getMinutes()+1) : (new Date(history.date).getMinutes()+1))}}
+					</p><br />
+					<p style="margin-bottom: 0px; float: left">
+						{{history.action}}
+					</p>
+				</div>
+				</div>
 			 </v-list-group>
 			</v-list>
 		    
@@ -358,6 +383,7 @@
 	  allUsers: [],
 	  readers: [],
 	  editors: [],
+	  histories: [],
 	  path: '',
 	  dialog: false,
 	  dialogDelPreviewImage: false,
@@ -417,7 +443,9 @@
 				for (var i = 0;i < data.data.comments.length; i++){
 					this.comments.push(data.data.comments[i])
 				}
-				
+				for (var i = 0;i < data.data.histories.length; i++){
+					this.histories.push(data.data.histories[i])
+				}
 			}).catch((error) => {this.failText = error.response.data; this.showFail = true; setTimeout(()=>{this.showFail=false},3000)});
 		}else{
 			this.author = this.getLoggedInData().sub;
@@ -542,11 +570,11 @@
 	  },
 	  postComment(){
 		  let commPayload = {message: this.commentText, userName: this.getLoggedInData().sub};
-		  this.axios.post(this.globalBackEndPath+"/resourceEntries/"+this.id+"/comments"+(this.idToComment=='new' ? '' : "/"+this.idToComment), commPayload).then(()=>{
+		  this.axios.post(this.globalBackEndPath+"/resourceEntries/"+this.id+"/comments"+(this.idToComment=='new' ? '' : "/"+this.idToComment), commPayload).then((resp)=>{
 			  this.successText = "Success!";
 			  this.showSuccess = true;
 			  setTimeout(()=>{this.showSuccess=false},3000);
-			  this.comments.push({message: commPayload.message, userName: this.getLoggedInData().sub, date: new Date(),replies:[]});
+			  this.comments.push({id: resp.data, message: commPayload.message, userName: this.getLoggedInData().sub, date: new Date(),replies:[]});
 		   }).catch((error)=>{this.failText = error.response.data; this.showFail = true; setTimeout(()=>{this.showFail=false},3000)});
 	  },
     },
