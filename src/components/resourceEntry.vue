@@ -524,7 +524,11 @@
         this.$refs.form.reset()
       },
 	  canEditEntry(){
-		return this.getLoggedInData().Role.indexOf('Admin') > -1 || this.author == this.getLoggedInData().sub || this.editors.indexOf(this.getLoggedInData().sub) > -1;
+		for (var i = 0; i < this.getLoggedInData().Role.length; i++){
+			if (this.getLoggedInData().Role[i].name == 'Admin')
+				return true;
+		}
+		return this.author == this.getLoggedInData().sub || this.editors.indexOf(this.getLoggedInData().sub) > -1;
 	  },
 	  deleteEntry (){
 		  this.axios.delete(this.globalBackEndPath+"/resourceEntries/"+this.id).then(()=>{this.successText = "Success!"; this.showSuccess = true; setTimeout(()=>{this.showSuccess=false;window.location.href="/resources"},3000)}).catch((error)=>{this.failText = error.response.data; this.showFail = true; setTimeout(()=>{this.showFail=false},3000)});

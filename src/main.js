@@ -10,6 +10,7 @@ import registration from './components/registration.vue'
 import login from './components/login.vue'
 import resources from './components/resources.vue'
 import resourceEntry from './components/resourceEntry.vue'
+import user from './components/user.vue'
 Vue.use(VueRouter)
 Vue.use(VueCookies)
 
@@ -64,6 +65,11 @@ let router = new VueRouter({
 	{
       path: '/resources',
       component: resources,
+    },
+    {
+      path: '/users/:id',
+      component: user,
+      props: true,
     },
 	{
       path: '/resourceEntry/:id',

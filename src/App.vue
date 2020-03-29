@@ -21,12 +21,12 @@
             <v-list-item-title>Resources</v-list-item-title>
           </v-list-item-content>
         </v-list-item>
-		<v-list-item link to="/tasks">
+    <v-list-item link :to="'/users/'+userName" v-if="loggedin === true">
           <v-list-item-action>
-            <v-icon>mdi-clipboard-text-outline</v-icon>
+            <v-icon>mdi-account-multiple-outline</v-icon>
           </v-list-item-action>
           <v-list-item-content>
-            <v-list-item-title>Tasks</v-list-item-title>
+            <v-list-item-title>User</v-list-item-title>
           </v-list-item-content>
         </v-list-item>
 		<v-list-item link to="/login" v-if="loggedin === false">
@@ -96,7 +96,9 @@
     },
     data: () => ({
       drawer: null,
-	  loggedin: false,
+    loggedin: false,
+    roles: [],
+    userName: '',
     }),
 	methods: {
 	  logout(){
@@ -113,8 +115,9 @@
 			//var jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
 			//	return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
 			//}).join(''));
-			
-			this.loggedin = (token.sub != '');
+			this.roles = token.Role;
+      this.loggedin = (token.sub != '');
+      this.userName = token.sub;
 		}else{
 			this.loggedin = false;
 		}
