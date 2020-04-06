@@ -150,6 +150,10 @@
         
       },
       canDeleteComment (author){
+          for (var i = 0; i < this.getLoggedInData().Role.length; i++){
+			if (this.getLoggedInData().Role[i].name == 'Admin')
+				return true;
+		  }
           return author == this.getLoggedInData().sub && author != 'anonymousUser';
       },
       deleteComment (){

@@ -93,6 +93,17 @@
 	  ]
     }),
     created: function(){
+      if (!!$cookies.get('JWTs')) {
+        if (this.username != $cookies.get('JWTs').sub){
+          this.failText = "Can only edit your own profile!"; this.showFail = true; setTimeout(()=>{this.showFail=false; window.location.href='/';},3000);
+          return;
+        }
+      }else{
+         this.failText = "Not logged in!"; this.showFail = true; setTimeout(()=>{this.showFail=false; window.location.href='/';},3000);
+         return;
+      }
+        
+
         this.axios.get(this.globalBackEndPath+"/user/"+this.username).then((data)=>{this.username = data.data.username; this.email = data.data.email})
         .catch((error) => {this.failText = error.response.data; this.showFail = true; setTimeout(()=>{this.showFail=false},3000)});;
     },
