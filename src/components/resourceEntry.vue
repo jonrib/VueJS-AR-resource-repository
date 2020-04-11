@@ -462,7 +462,7 @@
 				this.globalBackEndPath+"/resourceEntries/"+this.id,
 				payload
 			  ).then(() => {
-				  this.successText = "Successfuly updated entry!" + (this.previewImageFiles.length == 0 ? '' : ' Will upload images!') + (this.previewImageFiles.length == 0 ? '' : ' Will upload images!');
+				  this.successText = "Successfuly updated entry!" + (this.previewImageFiles.length == 0 ? '' : ' Will upload images!');
 				  this.showSuccess = true;
 				  if (this.previewImageFiles.length == 0 && this.uploadedFiles.length == 0){
 					  setTimeout(()=>{this.showSuccess=false;window.location.href="/resources"},3000);
@@ -495,6 +495,9 @@
 					}
 					var fileUrl =this.globalBackEndPath+"/resourceEntries/"+this.id+"/files";
 					if (this.uploadedFiles.length != 0){
+						this.successText = "Will update resource files!";
+						this.showSuccess = true;
+						setTimeout(()=>{this.showSuccess=false;},3000);
 						this.axios.post(fileUrl, 
 						formData2,
 						{
