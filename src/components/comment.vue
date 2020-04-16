@@ -74,7 +74,7 @@
         </v-dialog>
         <div class="float-left" :style="'width:100%;clear: both;padding-left:'+level*2+'%'">
             <p style="margin-bottom: 0px; float: left">
-                <b>{{comment.userName == '' || comment.userName == 'anonymousUser' ? 'Anonymous' : comment.userName}}</b> commented at {{new Date(comment.date).getFullYear()+'-'+((new Date(comment.date).getMonth()+1+'').length == 1 ? '0'+(new Date(comment.date).getMonth()+1) : (new Date(comment.date).getMonth()+1))+'-'+((new Date(comment.date).getDate()+1+'').length == 1 ? '0'+(new Date(comment.date).getDate()+1) : (new Date(comment.date).getDate()+1))+' '+((new Date(comment.date).getHours()+1+'').length == 1 ? '0'+(new Date(comment.date).getHours()+1) : (new Date(comment.date).getHours()+1))+':'+((new Date(comment.date).getMinutes()+1+'').length == 1 ? '0'+(new Date(comment.date).getMinutes()+1) : (new Date(comment.date).getMinutes()+1))}}
+                <b>{{comment.userName == '' || comment.userName == 'anonymousUser' ? 'Anonymous' : comment.userName}}</b> commented at {{new Date(comment.date).getFullYear()+'-'+((new Date(comment.date).getMonth()+1+'').length == 1 ? '0'+(new Date(comment.date).getMonth()+1) : (new Date(comment.date).getMonth()+1))+'-'+((new Date(comment.date).getDate()+'').length == 1 ? '0'+(new Date(comment.date).getDate()) : (new Date(comment.date).getDate()))+' '+((new Date(comment.date).getHours()+'').length == 1 ? '0'+(new Date(comment.date).getHours()) : (new Date(comment.date).getHours()))+':'+((new Date(comment.date).getMinutes()+'').length == 1 ? '0'+(new Date(comment.date).getMinutes()) : (new Date(comment.date).getMinutes()))}}
             </p><br />
             <p style="margin-bottom: 0px; float: left">
                 {{comment.message}}
