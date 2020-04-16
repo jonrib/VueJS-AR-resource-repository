@@ -74,7 +74,6 @@
 	  password: '',
       newPassword: '',
       newPasswordConfirm: '',
-	  successText: '',
       lazy: true,
 	  show1: false,
 	  show2: false,
