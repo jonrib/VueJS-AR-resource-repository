@@ -103,7 +103,7 @@
 	methods: {
 	  logout(){
     $cookies.set('JWTs', '');
-    this.axios.delete(this.globalBackEndPath+"/deleteJWT").then(()=>{window.location.reload();}).catch((error)=>{console.error(error.data);});
+    this.axios.delete(this.globalBackEndPath+"/deleteJWT").then(()=>{window.location.href="/";}).catch((error)=>{console.error(error.data);});
 	  }
 	},
 	created: function() {
