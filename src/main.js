@@ -19,7 +19,7 @@ Vue.$cookies.config('7d')
 Vue.mixin({
  data: function() {
    return {
-     globalBackEndPath:'http://localhost:8081',
+     globalBackEndPath:'',
 	 getLoggedInData: function(){
 		 if (!!$cookies.get('JWTs')) {
 			var roles = [];
