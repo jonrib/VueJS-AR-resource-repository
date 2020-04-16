@@ -347,7 +347,7 @@
 				<div v-for="history in histories" v-bind:key="history.id">
 					<div class="float-left" style="width:100%;clear: both;">
 					<p style="margin-bottom: 0px; float: left">
-						<b>{{history.userName == '' || history.userName == 'anonymousUser' ? 'Anonymous' : history.userName}}</b> made changes at {{new Date(history.date).getFullYear()+'-'+((new Date(history.date).getMonth()+1+'').length == 1 ? '0'+(new Date(history.date).getMonth()+1) : (new Date(history.date).getMonth()+1))+'-'+((new Date(history.date).getDate()+1+'').length == 1 ? '0'+(new Date(history.date).getDate()+1) : (new Date(history.date).getDate()+1))+' '+((new Date(history.date).getHours()+1+'').length == 1 ? '0'+(new Date(history.date).getHours()+1) : (new Date(history.date).getHours()+1))+':'+((new Date(history.date).getMinutes()+1+'').length == 1 ? '0'+(new Date(history.date).getMinutes()+1) : (new Date(history.date).getMinutes()+1))}}
+						<b>{{history.userName == '' || history.userName == 'anonymousUser' ? 'Anonymous' : history.userName}}</b> made changes at {{new Date(history.date).getFullYear()+'-'+((new Date(history.date).getMonth()+1+'').length == 1 ? '0'+(new Date(history.date).getMonth()+1) : (new Date(history.date).getMonth()+1))+'-'+((new Date(history.date).getDate()+'').length == 1 ? '0'+(new Date(history.date).getDate()) : (new Date(history.date).getDate()))+' '+((new Date(history.date).getHours()+'').length == 1 ? '0'+(new Date(history.date).getHours()) : (new Date(history.date).getHours()))+':'+((new Date(history.date).getMinutes()+'').length == 1 ? '0'+(new Date(history.date).getMinutes()) : (new Date(history.date).getMinutes()))}}
 					</p><br />
 					<p style="margin-bottom: 0px; float: left">
 						{{history.action}}
