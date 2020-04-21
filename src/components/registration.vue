@@ -80,7 +80,7 @@
       username: '',
       nameRules: [
         v => !!v || 'Username is required',
-        v => (v && v.length <= 9) || 'Username must be less than 9 characters',
+        v => (v && v.length <= 32 && v.length >= 6) || 'Username must be less than 32 characters and more than 6 characters',
       ],
       email: '',
       emailRules: [
