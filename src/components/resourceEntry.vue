@@ -581,7 +581,7 @@
 			  this.successText = "Success!";
 			  this.showSuccess = true;
 			  setTimeout(()=>{this.showSuccess=false},3000);
-			  this.comments.push({id: resp.data, message: commPayload.message, userName: this.getLoggedInData().sub, date: new Date(),replies:[]});
+			  this.comments.push({id: resp.data.id, message: commPayload.message, userName: this.getLoggedInData().sub, date: new Date(),replies:[]});
 		   }).catch((error)=>{this.failText = error.response.data; this.showFail = true; setTimeout(()=>{this.showFail=false},3000)});
 	  },
     },
