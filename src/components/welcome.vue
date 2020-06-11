@@ -14,7 +14,7 @@ export default {
   name: 'welcome',
   data () {
     return {
-      msg: 'Artificial reality repository application'
+      msg: 'Augmented reality repository application'
     }
   }
 }
