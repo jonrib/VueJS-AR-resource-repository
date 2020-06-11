@@ -47,7 +47,7 @@
         <v-card-title class="headline">Permanently delete resource entry?</v-card-title>
 
         <v-card-text>
-          WARNING: entry and all the files, tasks associated with it will be permanently deleted!
+          WARNING: entry and all the files associated with it will be permanently deleted!
         </v-card-text>
 
         <v-card-actions>
@@ -109,7 +109,6 @@
     >
       <v-card>
         <v-card-title class="headline">Permanently delete selected file?</v-card-title>
-
         <v-card-text>
           WARNING: file will be permanently deleted!
         </v-card-text>
@@ -408,6 +407,7 @@
 	  id: window.location.href.substring(window.location.href.lastIndexOf('/')+1,window.location.href.length),
 	  titleRules: [
 		 v => !!v || 'Title is required',
+		 v => (v && v.length <= 16 && v.length >= 2) || 'Tiltle must be less than 16 characters and more than 2 characters',
 	  ],
 	  previewImageHeaders: [
           {
@@ -440,13 +440,15 @@
 				for (var i = 0;i < data.data.files.length; i++){
 					this.uploadedPrevFiles.push({name: data.data.files[i].fileName, size: data.data.files[i].size, id: data.data.files[i].id})
 				}
+				data.data.comments = data.data.comments.sort((a, b) => {return b.date - a.date});
 				for (var i = 0;i < data.data.comments.length; i++){
 					this.comments.push(data.data.comments[i])
 				}
+				data.data.histories = data.data.histories.sort((a, b) => {return b.date - a.date});
 				for (var i = 0;i < data.data.histories.length; i++){
 					this.histories.push(data.data.histories[i])
 				}
-			}).catch((error) => {this.failText = error.response.data; this.showFail = true; setTimeout(()=>{this.showFail=false},3000)});
+			}).catch((error) => {this.failText = error.response.data; this.showFail = true; setTimeout(()=>{this.showFail=false;window.location.href="/resources"},3000)});
 		}else{
 			this.author = this.getLoggedInData().sub;
 		}
@@ -513,7 +515,7 @@
 		  }else{
 			this.axios.post(
 				this.globalBackEndPath+"/resourceEntries",
-				entry
+				payload
 			  ).then(() => {this.successText = "Success!"; this.showSuccess = true; setTimeout(()=>{this.showSuccess=false;window.location.href="/resources"},3000)}).catch((error) => {this.failText = error.response.data; this.showFail = true; setTimeout(()=>{this.showFail=false},3000)});
 		  }
 		}
@@ -525,7 +527,10 @@
       },
       reset () {
         this.$refs.form.reset()
-      },
+	  },
+	  loadViewDialog (url){
+		  this.viewerUrl = url;
+	  },
 	  canEditEntry(){
 		for (var i = 0; i < this.getLoggedInData().Role.length; i++){
 			if (this.getLoggedInData().Role[i].name == 'Admin')

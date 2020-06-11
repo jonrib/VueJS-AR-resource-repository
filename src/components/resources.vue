@@ -89,17 +89,23 @@
           </v-card>
         </v-col>
       </v-row>
-	  
+	  <div style="margin: auto;width: 50%;" v-if="loading">
+	  <v-progress-circular
+      :size="50"
+      color="primary"
+      indeterminate
+    ></v-progress-circular>
+		</div>
 		<v-pagination
 		  v-model="page"
 		  :length="numberOfPages"
 		></v-pagination>
-	  
   </v-container>
 </template>
 <script>
   export default {
     data: () => ({
+	  loading: false,
 	  page: 1,
 	  perPage: 18,
 	  numberOfPages: 0,
@@ -112,8 +118,9 @@
 	  tags: '',
     }),
 	created: function(){
+		this.loading = true;
 		this.path = this.globalBackEndPath;
-		this.axios.get(this.globalBackEndPath+"/resourceEntries").then((data)=> {this.all = data.data;for (var i = 0; i < this.all.length; i++){this.$set(this.showDesc, this.all[i].id, false);}}).catch((error)=>{console.error(error)});
+		this.axios.get(this.globalBackEndPath+"/resourceEntries").then((data)=> {this.loading = false; this.all = data.data;for (var i = 0; i < this.all.length; i++){this.$set(this.showDesc, this.all[i].id, false);}}).catch((error)=>{console.error(error)});
 		this.numberOfPages = Math.ceil(this.all.length / this.perPage);
 		this.all;
 	},
@@ -126,18 +133,22 @@
 			return  all.slice(from, to);
 		},
 		filterCategory (category){
+			this.all = [];
+			this.loading = true;
 			this.tags = '',
 			this.path = this.globalBackEndPath;
 			if (category == 'ALL')
-				this.axios.get(this.globalBackEndPath+"/resourceEntries").then((data)=> {this.all = data.data;for (var i = 0; i < this.all.length; i++){this.$set(this.showDesc, this.all[i].id, false);}}).catch((error)=>{console.error(error)});
+				this.axios.get(this.globalBackEndPath+"/resourceEntries").then((data)=> {this.loading = false; this.all = data.data;for (var i = 0; i < this.all.length; i++){this.$set(this.showDesc, this.all[i].id, false);}}).catch((error)=>{console.error(error)});
 			else
-				this.axios.get(this.globalBackEndPath+"/resourceEntries/category/"+category).then((data)=> {this.all = data.data;for (var i = 0; i < this.all.length; i++){this.$set(this.showDesc, this.all[i].id, false);}}).catch((error)=>{console.error(error)});
+				this.axios.get(this.globalBackEndPath+"/resourceEntries/category/"+category).then((data)=> {this.loading = false; this.all = data.data;for (var i = 0; i < this.all.length; i++){this.$set(this.showDesc, this.all[i].id, false);}}).catch((error)=>{console.error(error)});
 			this.numberOfPages = Math.ceil(this.all.length / this.perPage);
 			this.all;
 		},
 		filterByTags (){
+			this.all = [];
+			this.loading = true;
 			this.path = this.globalBackEndPath;
-			this.axios.get(this.globalBackEndPath+"/resourceEntries/tags/"+this.tags).then((data)=> {this.all = data.data;for (var i = 0; i < this.all.length; i++){this.$set(this.showDesc, this.all[i].id, false);}}).catch((error)=>{console.error(error)});
+			this.axios.get(this.globalBackEndPath+"/resourceEntries/tags/"+this.tags).then((data)=> {this.loading = false; this.all = data.data;for (var i = 0; i < this.all.length; i++){this.$set(this.showDesc, this.all[i].id, false);}}).catch((error)=>{console.error(error)});
 			this.numberOfPages = Math.ceil(this.all.length / this.perPage);
 			this.all;
 		},
